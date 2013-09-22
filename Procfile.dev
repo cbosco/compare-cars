@@ -1,0 +1,2 @@
+web:        bundle exec shotgun --env ${RACK_ENV:-development}
+test:       autotest -v
