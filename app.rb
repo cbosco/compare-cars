@@ -2,7 +2,7 @@
 
 require "sinatra"
 require "erb"
-require 'rest_client'
+require 'curb'
 require 'json'
 
 # https://gist.github.com/oisin/987247
@@ -53,29 +53,30 @@ end
 
 get "/makes" do
     unless params[:developerMode]
-        resp = RestClient.post "http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllMakes.dwr", { 
+        http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllMakes.dwr", {
             'callCount' => '1',
             'scriptSessionId' => '',
             'c0-scriptName' => 'ModelSearchUtil',
             'c0-methodName' => 'getAllMakes',
             'batchId' => '1'
-        }
+        })
+        resp = http.body_str
     else
         resp = File.read(File.join('samples', 'makes.json'))
-        puts resp
     end
     json_parse_autotrader_response resp
 end
 
 get "/models" do
     unless params[:developerMode]
-        resp = RestClient.post "http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllRetailModels.dwr", {
+        http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllRetailModels.dwr", {
             'callCount' => '1',
             'scriptSessionId' => '',
             'c0-scriptName' => 'ModelSearchUtil',
             'c0-methodName' => 'getAllRetailModels',
             'c0-param0' => "string:#{params[:make]}",
-        }
+        })
+        resp = http.body_str
     else
         # Chevrolet
         resp = File.read(File.join('samples', 'models.json'))
@@ -85,14 +86,15 @@ end
 
 get "/years" do
     unless params[:developerMode]
-        resp = RestClient.post "http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getRetailYearsByMakeModel.dwr", {
+        http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getRetailYearsByMakeModel.dwr", {
             'callCount' => '1',
             'scriptSessionId' => '',
             'c0-scriptName' => 'ModelSearchUtil',
             'c0-methodName' => 'getRetailYearsByMakeModel',
             'c0-param0' => "string:#{params[:make]}",
             'c0-param1' => "string:#{params[:model]}"
-        }
+        })
+        resp = http.body_str
     else
         # Chevrolet Corvette
         resp = File.read(File.join('samples', 'years.json'))
@@ -103,12 +105,13 @@ end
 # name, value pairs
 get "/trims" do
     unless params[:developerMode]
-        resp = RestClient.get "http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars", {
+        http = Curl.get("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars", {
             params: {
                 'cars'  =>  "year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}",
                 'column' => '1',
             }
-        }
+        })
+        resp = http.body_str
     else
         # 2012 Chevrolet Corvette
         resp = File.read(File.join('samples', 'trims.json'))
@@ -123,12 +126,13 @@ end
 
 get "/car" do
     unless params[:developerMode]
-        resp = RestClient.get "http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars", {
+        http = Curl.get("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars", {
             params: {
                 'cars'  =>  "year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}|styleId:#{params[:styleId]}",
                 'column' => '1',
             }
-        }
+        })
+        resp = http.body_str
     else
         # 2012 Chevrolet Corvette 2dr Cpe w/1LT (#332287)
         resp = File.read(File.join('samples', 'car.json'))
