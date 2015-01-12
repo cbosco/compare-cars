@@ -25,7 +25,7 @@ helpers do
         return MAJOR_VERSION == nums[0].to_i && MINOR_VERSION >= nums[1].to_i
     end
 end
- 
+
 # Enforce compatibility before the call. Rewrite the
 # URL in the request to remove the API versioning stuff
 #
@@ -105,12 +105,7 @@ end
 # name, value pairs
 get "/trims" do
     unless params[:developerMode]
-        http = Curl.get("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars", {
-            params: {
-                'cars'  =>  "year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}",
-                'column' => '1',
-            }
-        })
+        http = Curl::Easy.perform("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars?column=1&cars=year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}")
         resp = http.body_str
     else
         # 2012 Chevrolet Corvette
@@ -126,12 +121,7 @@ end
 
 get "/car" do
     unless params[:developerMode]
-        http = Curl.get("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars", {
-            params: {
-                'cars'  =>  "year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}|styleId:#{params[:styleId]}",
-                'column' => '1',
-            }
-        })
+        http = Curl::Easy.perform("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars?column=1&cars=year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}|styleId:#{params[:styleId]}")
         resp = http.body_str
     else
         # 2012 Chevrolet Corvette 2dr Cpe w/1LT (#332287)
