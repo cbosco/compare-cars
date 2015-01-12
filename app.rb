@@ -147,9 +147,9 @@ get "/car" do
 
         car['fuel'] = car_raw['featureMap']['fm_Fuel_Tank_Capacity__Approx__gal_']
         car['weight'] = car_raw['featureMap']['fm_Base_Curb_Weight__lbs_']
+        # often missing :(
         car['length'] = car_raw['featureMap']['fm_Length__Overall_w_o_rear_bumper__in_'].to_i
-        # todo: fall back to wheelbase?
-        # car['length'] = car_raw['featureMap']['fm_Wheelbase__in_']
+        car['wheelbase'] = car_raw['featureMap']['fm_Wheelbase__in_']
         car['width'] = car_raw['featureMap']['fm_Width__Max_w_o_mirrors__in_']
         car['height'] = car_raw['featureMap']['fm_Height__Overall__in_']
 
