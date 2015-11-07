@@ -60,10 +60,14 @@ get "/makes" do
             'c0-methodName' => 'getAllMakes',
             'batchId' => '1'
         })
+        puts 'vvvvvvvvvvvvvvv'
+        puts http
         resp = http.body_str
     else
         resp = File.read(File.join('samples', 'makes.json'))
     end
+    puts resp
+    puts '^^^^^^^^^^^^^^^'
     json_parse_autotrader_response resp
 end
 
