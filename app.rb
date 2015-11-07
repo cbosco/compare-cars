@@ -54,7 +54,7 @@ end
 get "/makes" do
     unless params[:developerMode]
         http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllMakes.dwr", {
-            'callCount' => '1',
+            'callCount' => 1,
             'scriptSessionId' => '',
             'c0-scriptName' => 'ModelSearchUtil',
             'c0-methodName' => 'getAllMakes',
