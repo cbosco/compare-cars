@@ -1,6 +1,7 @@
 #app.rb
 
 require "sinatra"
+require 'sinatra/cross_origin'
 require "erb"
 require 'curb'
 require 'json'
@@ -24,6 +25,14 @@ helpers do
     def version_compatible?(nums)
         return MAJOR_VERSION == nums[0].to_i && MINOR_VERSION >= nums[1].to_i
     end
+end
+
+configure do
+    enable :cross_origin
+end
+
+before do
+    response.headers['Access-Control-Allow-Origin'] = '*'
 end
 
 # Enforce compatibility before the call. Rewrite the
@@ -53,14 +62,15 @@ end
 
 get "/makes" do
     unless params[:developerMode]
-        http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllMakes.dwr", {
+        puts 'vvvvvvvvvvvvvvv'
+        http = Curl.post("https://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllMakes.dwr", {
             'callCount' => 1,
-            'scriptSessionId' => '',
+            'httpSessionId' => 'FAbxQSmsxek8BO8RhVV3Ta71cUNwMNHNuzY6eMyG.3e21ae40504c',
+            'scriptSessionId' => 'E81BA49D1D8F52CFACCD546896A683D0497',
             'c0-scriptName' => 'ModelSearchUtil',
             'c0-methodName' => 'getAllMakes',
-            'batchId' => '1'
+            'batchId' => 2
         })
-        puts 'vvvvvvvvvvvvvvv'
         puts http
         resp = http.body_str
     else
@@ -72,8 +82,10 @@ get "/makes" do
 end
 
 get "/models" do
+        puts 'vvvvvvvvvvvvvvv'
     unless params[:developerMode]
-        http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllRetailModels.dwr", {
+        
+        http = Curl.post("https://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getAllRetailModels.dwr", {
             'callCount' => '1',
             'scriptSessionId' => '',
             'c0-scriptName' => 'ModelSearchUtil',
@@ -85,12 +97,14 @@ get "/models" do
         # Chevrolet
         resp = File.read(File.join('samples', 'models.json'))
     end
+    puts resp
+    puts '^^^^^^^^^^^^^^^'
     json_parse_autotrader_response resp
 end
 
 get "/years" do
     unless params[:developerMode]
-        http = Curl.post("http://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getRetailYearsByMakeModel.dwr", {
+        http = Curl.post("https://www.autotrader.com/dwr/call/plaincall/ModelSearchUtil.getRetailYearsByMakeModel.dwr", {
             'callCount' => '1',
             'scriptSessionId' => '',
             'c0-scriptName' => 'ModelSearchUtil',
@@ -109,7 +123,7 @@ end
 # name, value pairs
 get "/trims" do
     unless params[:developerMode]
-        http = Curl::Easy.perform("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars?column=1&cars=year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}")
+        http = Curl::Easy.perform("https://www.autotrader.com/ac-servlets/research/compare/ctr/getCars?column=1&cars=year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}")
         resp = http.body_str
     else
         # 2012 Chevrolet Corvette
@@ -125,7 +139,7 @@ end
 
 get "/car" do
     unless params[:developerMode]
-        http = Curl::Easy.perform("http://www.autotrader.com/ac-servlets/research/compare/ctr/getCars?column=1&cars=year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}|styleId:#{params[:styleId]}")
+        http = Curl::Easy.perform("https://www.autotrader.com/ac-servlets/research/compare/ctr/getCars?column=1&cars=year:#{params[:year]}|make:#{params[:make]}|model:#{params[:model]}|styleId:#{params[:styleId]}")
         resp = http.body_str
     else
         # 2012 Chevrolet Corvette 2dr Cpe w/1LT (#332287)
@@ -163,5 +177,13 @@ get "/car" do
     rescue
         {}.to_json
     end
+end
+
+
+options "*" do
+	response.headers["Allow"] = "GET, POST, OPTIONS"
+	response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
+	response.headers["Access-Control-Allow-Origin"] = "*"
+	200
 end
 
